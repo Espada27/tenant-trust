@@ -21,7 +21,23 @@ const prepareRentDataWrite = (rent) => {
   ];
 };
 
-const rentArrayToObject = (rent, landlordAddress, tenantAddress) => {
+type Rent = {
+    stakingContract: string,
+    startTime: number,
+    duration: number,
+    rentRate: number,
+    rentFees: number,
+    alreadyPaid: number,
+    rentalDeposit: number,
+    leaseUri: string,
+    landlordApproval: boolean,
+    tenantApproval: boolean,
+    creationTime: number,
+    landlordAddress: string,
+    tenantAddress: string,
+};
+
+const rentArrayToObject = (rent: any[], landlordAddress: string, tenantAddress: string): Rent => {
   return {
     stakingContract: rent[0],
     startTime: Number(rent[1]) * 1000,
@@ -39,7 +55,7 @@ const rentArrayToObject = (rent, landlordAddress, tenantAddress) => {
   };
 };
 
-const bigIntToNumber = (bigInt) => {
+const bigIntToNumber = (bigInt: bigint) => {
   return Number(bigInt / 10n ** 18n);
 };
 
@@ -49,7 +65,7 @@ const useTenantTrust = () => {
   const [rentDuration, setRentDuration] = useState(0);
   const { address, isConnected } = useAccount();
   const toast = useToast();
-  const successToast = (title, description) => {
+  const successToast = (title: string, description?: string) => {
     toast({
       title,
       description,
@@ -59,7 +75,7 @@ const useTenantTrust = () => {
     });
   };
 
-  const errorToast = (title, description) => {
+  const errorToast = (title: string, description?: string) => {
     toast({
       title,
       description,
@@ -78,7 +94,7 @@ const useTenantTrust = () => {
         abi: TENANT_TRUST_ABI,
         functionName: "createRentContract",
         args: prepareRentDataWrite(rent),
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -98,7 +114,7 @@ const useTenantTrust = () => {
         abi: TENANT_TRUST_ABI,
         functionName: "approveContract",
         args: [rent.tenantAddress, rent.landlordAddress],
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -109,7 +125,7 @@ const useTenantTrust = () => {
     }
   };
 
-  const payRent = async (rent, amount) => {
+  const payRent = async (rent, amount: number) => {
     console.log("Paying the rent :", amount);
     const walletClient = await getWalletClient();
     try {
@@ -118,7 +134,7 @@ const useTenantTrust = () => {
         abi: TENANT_TRUST_ABI,
         functionName: "payRent",
         args: [rent.landlordAddress, BigInt(amount) * 10n ** 18n],
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -139,7 +155,7 @@ const useTenantTrust = () => {
         abi: TENANT_TRUST_ABI,
         functionName: "startRent",
         args: [rent.tenantAddress],
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -168,7 +184,7 @@ const useTenantTrust = () => {
     }
   };
 
-  const getRent = async (landlordAddress, tenantAddress) => {
+  const getRent = async (landlordAddress: string, tenantAddress: string) => {
     try {
       const data = await readContract({
         address: TENANT_TRUST_ADDRESS,

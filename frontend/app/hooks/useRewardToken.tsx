@@ -13,7 +13,7 @@ import {
 } from "../constants/constant";
 import { useAccount } from "wagmi";
 
-const bigIntToNumber = (bigInt) => {
+const bigIntToNumber = (bigInt: bigint) => {
   return Number(bigInt / 10n ** 18n);
 };
 
@@ -21,7 +21,7 @@ const useRewardToken = () => {
   const [isRewardOwner, setIsRewardOwner] = useState(false);
   const { address, isConnected } = useAccount();
 
-  const transferTo = async (to, amount) => {
+  const transferTo = async (to: string, amount: number) => {
     const bigIntAmount = BigInt(amount) * 10n ** 18n;
     console.log("Transfer : ", to, bigIntAmount);
     const walletClient = await getWalletClient();
@@ -57,7 +57,7 @@ const useRewardToken = () => {
     }
   };
 
-  const allowance = async (spender) => {
+  const allowance = async (spender: string) => {
     try {
       const data = await readContract({
         address: TENANT_TRUST_TOKEN_ADDRESS,

@@ -47,7 +47,7 @@ export default function CreateRent() {
     }
   };
 
-  const handleUpdate = (key, value) => {
+  const handleUpdate = (key: string, value: any) => {
     const newRent = {
       ...rent,
       [key]: value,

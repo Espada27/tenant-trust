@@ -9,7 +9,7 @@ import {
 import { parseAbiItem } from "viem";
 import useTenantTrust from "../hooks/useTenantTrust";
 
-const DataContext = createContext();
+const DataContext = createContext(null);
 
 export const useTenantTrustContext = () => {
   return useContext(DataContext);
@@ -19,9 +19,9 @@ export const DataProvider = ({ children }) => {
   const viemPublicClient = usePublicClient();
   const { address, isConnected } = useAccount();
   const { getRent } = useTenantTrust();
-  const [rentsAsLandlord, setRentsAsLandlord] = useState([]);
-  const [rentsAsTenant, setRentsAsTenant] = useState([]);
-  const [rentsAsOther, setRentsAsOther] = useState([]);
+  const [rentsAsLandlord, setRentsAsLandlord] = useState<any>([]);
+  const [rentsAsTenant, setRentsAsTenant] = useState<any>([]);
+  const [rentsAsOther, setRentsAsOther] = useState<any>([]);
 
   const initRents = async () => {
     const rentLogs = await viemPublicClient.getLogs({
@@ -63,7 +63,9 @@ export const DataProvider = ({ children }) => {
     address: TENANT_TRUST_ADDRESS,
     abi: TENANT_TRUST_ABI,
     eventName: "ContractCreated",
-    listener: async (events) => {
+    listener: async (
+      events: [{ args: { tenant: string; landlord: string } }]
+    ) => {
       for (const event of events) {
         const tenantAddr = event.args.tenant;
         const landlordAddr = event.args.landlord;
@@ -85,7 +87,11 @@ export const DataProvider = ({ children }) => {
     },
   });
 
-  const isAlreadyPresent = (tenant, landlord, rentArray) => {
+  const isAlreadyPresent = (
+    tenant: string,
+    landlord: string,
+    rentArray: [{ landlordAddress: string; tenantAddress: string }]
+  ) => {
     return rentArray.some(
       (rent) => rent.landlordAddress == landlord && rent.tenantAddress == tenant
     );

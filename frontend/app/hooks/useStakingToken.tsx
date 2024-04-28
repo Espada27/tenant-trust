@@ -13,15 +13,15 @@ import {
 } from "../constants/constant";
 import { useAccount } from "wagmi";
 
-const bigIntToNumber = (bigInt) => {
+const bigIntToNumber = (bigInt: bigint) => {
   return Number(bigInt / 10n ** 18n);
 };
 
-const useStakingToken = (stakingAddress) => {
+const useStakingToken = (stakingAddress: any) => {
   const [isOwner, setIsOwner] = useState(false);
   const { address, isConnected } = useAccount();
 
-  const increaseAllowance = async (spender, amount) => {
+  const increaseAllowance = async (spender: string, amount: number) => {
     const bigIntAmount = BigInt(amount) * 10n ** 18n;
     console.log("Approve : ", stakingAddress, bigIntAmount);
     const walletClient = await getWalletClient();
@@ -31,7 +31,7 @@ const useStakingToken = (stakingAddress) => {
         abi: STAKING_TOKEN_ABI,
         functionName: "approve",
         args: [spender, bigIntAmount],
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -57,14 +57,14 @@ const useStakingToken = (stakingAddress) => {
     }
   };
 
-  const allowance = async (spender) => {
+  const allowance = async (spender: unknown) => {
     try {
       const data = await readContract({
         address: STAKING_TOKEN_ADDRESS,
         abi: STAKING_TOKEN_ABI,
         functionName: "allowance",
         args: [address, spender],
-      });
+      }) as bigint;
       console.log("Get allowance : ", data);
       return bigIntToNumber(data);
     } catch (err) {
@@ -79,7 +79,7 @@ const useStakingToken = (stakingAddress) => {
         abi: STAKING_TOKEN_ABI,
         functionName: "balanceOf",
         args: [address],
-      });
+      }) as bigint;
       return bigIntToNumber(data);
     } catch (err) {
       console.error("Error while fetching the balance:", err.message);

@@ -11,15 +11,15 @@ import { STAKING_ABI } from "../constants/constant";
 import { useAccount } from "wagmi";
 import { useToast } from "@chakra-ui/react";
 
-const bigIntToNumber = (bigInt) => {
+const bigIntToNumber = (bigInt: bigint) => {
   return Number(bigInt / 10n ** 18n);
 };
 
-const useStaking = (stakingAddress) => {
+const useStaking = (stakingAddress: any) => {
   const [isOwner, setIsOwner] = useState(false);
   const { address, isConnected } = useAccount();
   const toast = useToast();
-  const successToast = (title, description) => {
+  const successToast = (title: string, description?: string) => {
     toast({
       title,
       description,
@@ -29,7 +29,7 @@ const useStaking = (stakingAddress) => {
     });
   };
 
-  const errorToast = (title, description) => {
+  const errorToast = (title: string, description?: string) => {
     toast({
       title,
       description,
@@ -39,7 +39,7 @@ const useStaking = (stakingAddress) => {
     });
   };
 
-  const stake = async (stakingAmount) => {
+  const stake = async (stakingAmount: string | number | bigint | boolean) => {
     const walletClient = await getWalletClient();
     try {
       const bigIntAmount = BigInt(stakingAmount) * 10n ** 18n;
@@ -49,7 +49,7 @@ const useStaking = (stakingAddress) => {
         abi: STAKING_ABI,
         functionName: "stake",
         args: [bigIntAmount],
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -62,7 +62,7 @@ const useStaking = (stakingAddress) => {
     }
   };
 
-  const withdraw = async (withdrawAmount) => {
+  const withdraw = async (withdrawAmount: string | number | bigint | boolean) => {
     const walletClient = await getWalletClient();
     try {
       const bigIntAmount = BigInt(withdrawAmount) * 10n ** 18n;
@@ -72,7 +72,7 @@ const useStaking = (stakingAddress) => {
         abi: STAKING_ABI,
         functionName: "withdraw",
         args: [bigIntAmount],
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -95,7 +95,7 @@ const useStaking = (stakingAddress) => {
         address: stakingAddress,
         abi: STAKING_ABI,
         functionName: "claim",
-        account: walletClient.account,
+        account: walletClient?.account,
       });
       const { hash } = await writeContract(request);
       await waitForTransaction({ hash });
@@ -128,7 +128,7 @@ const useStaking = (stakingAddress) => {
         abi: STAKING_ABI,
         functionName: "earned",
         args: [address],
-      });
+      }) as bigint;
       //get 4 decimals precision
       return Number(data / 10n ** 18n);
     } catch (err) {
@@ -143,7 +143,7 @@ const useStaking = (stakingAddress) => {
         abi: STAKING_ABI,
         functionName: "balanceOf",
         args: [address],
-      });
+      }) as bigint;
       return Number(data / 10n ** 18n);
     } catch (err) {
       console.error("Error in earned:", err.message);
@@ -157,7 +157,7 @@ const useStaking = (stakingAddress) => {
         abi: STAKING_ABI,
         functionName: "balanceOf",
         args: [address],
-      });
+      }) as bigint;
       return data > 0n;
     } catch (err) {
       console.error("Error in earned:", err.message);
@@ -170,7 +170,7 @@ const useStaking = (stakingAddress) => {
         address: stakingAddress,
         abi: STAKING_ABI,
         functionName: "totalSupply",
-      });
+      }) as bigint;
       return bigIntToNumber(data);
     } catch (err) {
       console.error("Error while fetching the total supply:", err.message);
